@@ -7,15 +7,15 @@ const router = express.Router();
 // every route in this file requires a valid token
 router.use(authMiddleware);
 
-// GET /api/meals?date=2026-07-08  (date optional, defaults to today)
+// GET /api/meals?date=2026-07-08  (date optional, defaults to today in DB time)
 router.get('/', async (req, res) => {
-  const date = req.query.date || new Date().toISOString().split('T')[0];
+  const date = req.query.date || null;
 
   try {
     const mealsResult = await pool.query(
       `SELECT id, name, calories, meal_type, eaten_on
        FROM meals
-       WHERE user_id = $1 AND eaten_on = $2
+       WHERE user_id = $1 AND eaten_on = COALESCE($2::date, CURRENT_DATE)
        ORDER BY created_at ASC`,
       [req.userId, date]
     );
@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     const totalResult = await pool.query(
       `SELECT COALESCE(SUM(calories), 0) AS total
        FROM meals
-       WHERE user_id = $1 AND eaten_on = $2`,
+       WHERE user_id = $1 AND eaten_on = COALESCE($2::date, CURRENT_DATE)`,
       [req.userId, date]
     );
 
