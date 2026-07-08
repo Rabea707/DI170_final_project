@@ -38,6 +38,35 @@ router.get('/', async (req, res) => {
   }
 });
 
+// GET /api/meals/summary?days=7 -> daily totals for the chart
+// (must come BEFORE /:id routes, or Express thinks "summary" is an id)
+router.get('/summary', async (req, res) => {
+  const days = parseInt(req.query.days) || 7;
+
+  try {
+    const result = await pool.query(
+      `SELECT eaten_on, SUM(calories) AS total
+       FROM meals
+       WHERE user_id = $1
+         AND eaten_on >= CURRENT_DATE - ($2 - 1) * INTERVAL '1 day'
+       GROUP BY eaten_on
+       ORDER BY eaten_on ASC`,
+      [req.userId, days]
+    );
+
+    res.json({
+      days,
+      data: result.rows.map((row) => ({
+        date: row.eaten_on,
+        total: parseInt(row.total),
+      })),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // POST /api/meals
 router.post('/', async (req, res) => {
   const { name, calories, meal_type, eaten_on } = req.body;
