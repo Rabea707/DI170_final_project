@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMeals, addMeal, deleteMeal } from '../api';
 import WeeklyChart from '../components/WeeklyChart';
+import { updateGoal } from '../api';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ function Dashboard() {
   const [meals, setMeals] = useState([]);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState('');
+
+  const [editingGoal, setEditingGoal] = useState(false);
+  const [newGoal, setNewGoal] = useState('');
 
   // add meal form
   const [name, setName] = useState('');
@@ -56,6 +60,20 @@ function Dashboard() {
     }
   }
 
+  async function handleGoalSubmit(e) {
+    e.preventDefault();
+    try {
+      const updated = await updateGoal(parseInt(newGoal));
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      const updatedUser = { ...storedUser, daily_goal: updated.daily_goal };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setEditingGoal(false);
+      window.location.reload(); // simplest way to refresh goal everywhere
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -82,9 +100,28 @@ function Dashboard() {
           <h3>Today</h3>
           <p className="big">{total} kcal</p>
         </div>
-        <div className="stat">
+       <div className="stat">
           <h3>Goal</h3>
-          <p className="big">{goal} kcal</p>
+          {editingGoal ? (
+            <form onSubmit={handleGoalSubmit} className="goal-form">
+              <input
+                type="number"
+                value={newGoal}
+                onChange={(e) => setNewGoal(e.target.value)}
+                min="1"
+                placeholder={goal}
+                required
+              />
+              <button type="submit">Save</button>
+              <button type="button" onClick={() => setEditingGoal(false)}>
+                Cancel
+              </button>
+            </form>
+          ) : (
+            <p className="big" onClick={() => setEditingGoal(true)}>
+              {goal} kcal ✏️
+            </p>
+          )}
         </div>
         <div className="stat">
           <h3>{remaining >= 0 ? 'Remaining' : 'Over goal'}</h3>
