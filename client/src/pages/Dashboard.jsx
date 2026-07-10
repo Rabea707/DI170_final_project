@@ -100,7 +100,7 @@ function Dashboard() {
           <h3>Today</h3>
           <p className="big">{total} kcal</p>
         </div>
-       <div className="stat">
+        <div className="stat">
           <h3>Goal</h3>
           {editingGoal ? (
             <form onSubmit={handleGoalSubmit} className="goal-form">
@@ -126,6 +126,21 @@ function Dashboard() {
         <div className="stat">
           <h3>{remaining >= 0 ? 'Remaining' : 'Over goal'}</h3>
           <p className="big">{Math.abs(remaining)} kcal</p>
+        </div>
+      </section>
+
+      <section className="goal-progress">
+        <div className="row">
+          <span>
+            <b>{total}</b> / {goal} kcal
+          </span>
+          <span>{Math.min(Math.round((total / goal) * 100), 999)}%</span>
+        </div>
+        <div className="track">
+          <div
+            className={`fill ${total > goal ? 'over' : ''}`}
+            style={{ width: `${Math.min((total / goal) * 100, 100)}%` }}
+          />
         </div>
       </section>
 
@@ -161,7 +176,7 @@ function Dashboard() {
       <section className="meals-list">
         <h2>Today's meals</h2>
         {meals.length === 0 ? (
-          <p>No meals logged yet today.</p>
+          <p className="empty-state">No meals logged yet today. Add your first one above 👆</p>
         ) : (
           <ul>
             {meals.map((meal) => (
