@@ -26,14 +26,14 @@ async function request(path, options = {}) {
 
 // auth
 export function register(username, email, password) {
-  return request('/auth/register', {
+  return request('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({ username, email, password }),
   });
 }
 
 export function login(email, password) {
-  return request('/auth/login', {
+  return request('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
@@ -41,27 +41,27 @@ export function login(email, password) {
 
 // meals
 export function getMeals(date) {
-  return request(date ? `/meals?date=${date}` : '/meals');
+  return request(date ? `/api/meals?date=${date}` : '/api/meals');
 }
 
 export function addMeal(meal) {
-  return request('/meals', {
+  return request('/api/meals', {
     method: 'POST',
     body: JSON.stringify(meal),
   });
 }
 
 export function deleteMeal(id) {
-  return request(`/meals/${id}`, { method: 'DELETE' });
+  return request(`/api/meals/${id}`, { method: 'DELETE' });
 }
 
 export function getSummary(days = 7) {
-  return request(`/meals/summary?days=${days}`);
+  return request(`/api/meals/summary?days=${days}`);
 }
 
 // user
 export function updateGoal(daily_goal) {
-  return request('/users/goal', {
+  return request('/api/users/goal', {
     method: 'PUT',
     body: JSON.stringify({ daily_goal }),
   });
