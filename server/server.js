@@ -7,7 +7,9 @@ const pool = require('./db');
 const app = express();
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+}));
 app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/meals', require('./routes/meals'));
