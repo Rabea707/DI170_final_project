@@ -146,3 +146,15 @@ Open http://localhost:5173.
 
 **Rabea Sayegh**
 Portfolio: [sayeghtech.com](https://sayeghtech.com) · GitHub: [Rabea707](https://github.com/Rabea707) · LinkedIn: [rabea-sayegh](https://www.linkedin.com/in/rabea-sayegh-7b0ab4369)
+
+
+## Running Tests
+
+The server has a Jest + Supertest suite covering auth, validation, and per-user
+authorization (e.g. one user cannot delete another user's meals). The database
+is mocked, so no setup is needed:
+
+```bash
+cd server
+npm test
+```
